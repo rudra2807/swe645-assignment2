@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-website
+  labels:
+    app: my-website
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-website
+  template:
+    metadata:
+      labels:
+        app: my-website
+    spec:
+      containers:
+        - name: my-website
+          image: rudra2807/swe645-assignment2:latest
+          ports:
+            - containerPort: 80
