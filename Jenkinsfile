@@ -28,7 +28,7 @@ pipeline {
         stage('Deploy to EKS') {
             steps {
                 // Using the Kubeconfig to update the Kubernetes deployment
-                bat "kubectl set image deployment/my-deployment my-container=${DOCKER_IMAGE}:${DOCKER_TAG} --kubeconfig=\"C:\\Program Files\\Jenkins\\kubeconfig\""
+                bat "kubectl set image deployment/my-website my-container=${DOCKER_IMAGE}:${DOCKER_TAG} --kubeconfig=\"C:\\Program Files\\Jenkins\\kubeconfig\""
             }
         }
     }
