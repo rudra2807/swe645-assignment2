@@ -9,8 +9,7 @@ pipeline {
          stage('Clone Repository') {
             steps {
                 // Clone the repository
-                git 
-                    branch: 'main',
+                git branch: 'main',
                     credentialsId: 'github-credentials', 
                     url: 'https://github.com/rudra2807/swe645-assignment2.git'
             }
