@@ -29,7 +29,7 @@ pipeline {
                         usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASS')
                     ]) {
                         bat "echo logging into Docker Hub..."
-                        bat "echo | set /p=%DOCKER_PASS% | docker login --username %DOCKER_USERNAME% --password-stdin"
+                        bat "echo | set /p=\"%DOCKER_PASS%\" | docker login --username %DOCKER_USERNAME% --password-stdin"
                         bat "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
                     }
                 }
