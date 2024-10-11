@@ -38,7 +38,7 @@ pipeline {
                 // Using the Kubeconfig to update the Kubernetes deployment
                 bat "kubectl set image deployment/my-website my-website=${DOCKER_IMAGE}:${DOCKER_TAG} --kubeconfig=\"C:\\Program Files\\Jenkins\\kubeconfig\""
                 // Restart the pods to reflect the new changes
-                bat "kubectl rollout restart deployment my-website"
+                bat "kubectl rollout restart deployment my-website --kubeconfig=\"C:\\Program Files\\Jenkins\\kubeconfig\""
             }
         }
     }
