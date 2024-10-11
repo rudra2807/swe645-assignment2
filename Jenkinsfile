@@ -6,6 +6,12 @@ pipeline {
         KUBECONFIG_PATH = 'C:\\Program Files\\Jenkins\\kubeconfig'
     }
     stages {
+         stage('Clone Repository') {
+            steps {
+                // Clone the repository
+                git credentialsId: 'github-credentials', url: 'https://github.com/rudra2807/swe645-assignment2'
+            }
+        }
         stage('Build Docker Image') {
             steps {
                 script {
