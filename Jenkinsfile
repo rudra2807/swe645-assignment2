@@ -25,11 +25,13 @@ pipeline {
         stage('Push to DockerHub') {
             steps {
                 script {
-                    // Login to DockerHub (if not logged in)
-                    bat "echo logging into Docker Hub..."
-                    bat "docker login --username rudra2807 --password 
-                    // Pushing image to DockerHub
-                    bat "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    withCredentials([
+                        usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASS')
+                    ]) {
+                        bat "echo logging into Docker Hub..."
+                        bat "echo %DOCKER_PASS% | docker login --username %DOCKER_USERNAME% --password-stdin"
+                        bat "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    }
                 }
             }
         }
