@@ -8,7 +8,7 @@ WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 
 # Copy static assets from builder stage
-COPY . .
+COPY ./my-website .
 
 # Containers run nginx with global directives and daemon off
 CMD ["nginx", "-g", "daemon off;"]
