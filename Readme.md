@@ -184,7 +184,7 @@ metadata:
   labels:
     app: my-website
 spec:
-  replicas: 3 # Creates 3 pods for high availability
+  replicas: 3
   selector:
     matchLabels:
       app: my-website
@@ -195,16 +195,9 @@ spec:
     spec:
       containers:
         - name: my-website
-          image: <container-image>:<tag> # Replace with your image
+          image: rudra2807/swe645-assignment2:latest
           ports:
             - containerPort: 80
-          resources:
-            requests:
-              memory: "64Mi"
-              cpu: "250m"
-            limits:
-              memory: "128Mi"
-              cpu: "500m"
 ```
 
 2. Create `service.yaml`:
@@ -214,14 +207,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: my-website-service
-  annotations:
-    service.beta.kubernetes.io/aws-load-balancer-type: "nlb" # Network Load Balancer
 spec:
   type: LoadBalancer
   ports:
     - port: 80
       targetPort: 80
-      protocol: TCP
   selector:
     app: my-website
 ```
@@ -300,30 +290,48 @@ The LoadBalancer external IP can take a few minutes to provision. Once available
 ```groovy
 pipeline {
     agent any
-
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
-        AWS_CREDENTIALS = credentials('aws')
+        DOCKER_IMAGE = ''  // Replace with your Docker image name
+        DOCKER_TAG = 'latest'
+        KUBECONFIG_PATH = ''  // Replace with your kubeconfig path
     }
-
     stages {
-        stage('Build') {
+        stage('Clone Repository') {
             steps {
-                sh 'docker build -t <your-image-name> .'
+                // Clone the repository
+                git branch: 'main',
+                    credentialsId: '',  // Add your GitHub credentials ID
+                    url: ''  // Add your repository URL
             }
         }
-
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                }
+            }
+        }
         stage('Push to DockerHub') {
             steps {
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                sh 'docker push <your-image-name>'
+                script {
+                    withCredentials([
+                        usernamePassword(credentialsId: '',  // Add your DockerHub credentials ID
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASS')
+                    ]) {
+                        bat "echo logging into Docker Hub..."
+                        bat "echo | set /p=\"%DOCKER_PASS%\" | docker login --username %DOCKER_USERNAME% --password-stdin"
+                        bat "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    }
+                }
             }
         }
-
-        stage('Deploy to Kubernetes') {
+        stage('Deploy to EKS') {
             steps {
-                sh 'kubectl apply -f deployment.yaml'
-                sh 'kubectl apply -f service.yaml'
+                // Using the Kubeconfig to update the Kubernetes deployment
+                bat "kubectl set image deployment/my-website my-website=${DOCKER_IMAGE}:${DOCKER_TAG} --kubeconfig=\"C:\\Program Files\\Jenkins\\kubeconfig\""
+                // Restart the pods to reflect the new changes
+                bat "kubectl rollout restart deployment my-website --kubeconfig=\"C:\\Program Files\\Jenkins\\kubeconfig\""
             }
         }
     }
